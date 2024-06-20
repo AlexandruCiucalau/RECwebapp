@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+
+  my-sba:
+    image: openjdk:17-jdk-alpine
+    container_name: mysbaimage
+    ports:
+      - 8080:8080
+      - 8000:8000
+    expose:
+      - "8000"
+    depends_on:
+      - my-db
+    networks:
+      - my-net
+    volumes:
+      - ./build/libs/RecProjectio-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    entrypoint: java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 -jar /app/app.jar
+  my-db:
+    image: mongo:5.0
+    container_name: mongodbimage
+    ports:
+      - 27017:27017
+    networks:
+      - my-net
+networks:
+  my-net:
+    driver:
+      "bridge"
+
