@@ -50,6 +50,9 @@ public class UserRestController {
     @Autowired
     RewardRepository rewardRepository;
 
+    @Autowired
+    TaskRepository taskRepository;
+
     @RequestMapping(value="/{id}", method = RequestMethod.GET)
     public UserDTO get(@PathVariable String id) throws UserNotFoundException {
 
@@ -341,5 +344,40 @@ public class UserRestController {
         energySummary.setTotalSurplusEnergy(totalSurplusEnergy);
 
         return ResponseEntity.ok(energySummary);
+    }
+    @PostMapping(value = "/{userId}/tasks", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> submitTask(
+            @PathVariable String userId,
+            @RequestBody TaskDTO taskDTO
+    ) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        Task task = new Task();
+        task.setLink(taskDTO.getLink());
+        task.setUserId(userId);
+        taskRepository.save(task);
+
+        return ResponseEntity.ok("Task submitted successfully");
+    }
+    @GetMapping(value = "/{userId}/tasks", produces = "application/json")
+    public List<TaskDTO> getTasksByUserId(@PathVariable String userId) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        List<Task> tasks = taskRepository.findByUserId(userId);
+        return tasks.stream().map(this::convertToTaskDTO).collect(Collectors.toList());
+    }
+
+    private TaskDTO convertToTaskDTO(Task task) {
+        TaskDTO taskDTO = new TaskDTO();
+        taskDTO.setId(task.getId());
+        taskDTO.setLink(task.getLink());
+        taskDTO.setUserId(task.getUserId());
+        return taskDTO;
     }
 }

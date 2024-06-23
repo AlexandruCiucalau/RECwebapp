@@ -26,6 +26,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {
@@ -42,6 +44,7 @@ jacocoTestReport {
 	reports {
 		xml.required.set(true)
 		csv.required.set(false)
+		html.required.set(true)
 		html.outputLocation.set(layout.buildDirectory.dir('jacocoHtml'))
 	}
 }
